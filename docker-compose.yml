@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:10.0
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data/
+  web:
+    restart: always
+    image: web
+    build: ./
+    command: >
+      bash -c "./manage.py migrate &&
+               ./manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
