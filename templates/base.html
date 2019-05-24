@@ -1,0 +1,44 @@
+
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% load static %}
+
+    <link rel="stylesheet" href="{% static 'css/navibar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/css.css' %}">
+    <link rel="stylesheet" href="{% static 'fontawesome/css/font-awesome.min.css' %}">
+
+    <!-- header -->
+    {% include 'header.html' %}
+    <!-- header -->
+
+    <!-- navibar -->
+    {% include 'navibar.html' %}
+    <!-- navibar -->
+
+    <div class="container-fluid" style="margin-top: 20px;">
+        {% block alert %}
+
+            {% include 'alerts.html' %}
+
+        {% endblock %}
+    </div>
+
+    <div class="container" style="margin-top: 20px;">
+        {% block content %}
+
+            <!-- content -->
+
+        {% endblock %}
+    </div>
+
+    <!-- Footer -->
+    {% include 'footer.html' %}
+    <!-- Footer -->
+
+    {% block scripts %}
+
+        <!-- Scripts -->
+
+    {% endblock %}
