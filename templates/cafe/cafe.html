@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+    <div class="container" style="max-width: 900px; padding-bottom: 30px">
+    <div class="container-fluid">
+        <h2 class="h1 text-center mb-3 font-weight-light">About us</h2>
+
+        <div class="col-md-12 blog-main">
+            <div class="row mb-2">
+                <div class="col-md-12">
+                        <div class="card-body d-flex flex-column align-items-start">
+                        <div class="blog-post">
+                            <div>
+                                <p class="text-justify">{{ cafe.description }}</p>
+                            </div>
+                        <div class="mb-0 text-muted" id="post-date">Address : {{ cafe.address }}</div>
+                        <div class="mb-0 text-muted" id="post-date">Contact : {{ cafe.email }}, {{ cafe.phone_number }}</div>
+                        </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+{% endblock %}
