@@ -55,3 +55,17 @@ class Client(models.Model):
 
     def __str__(self):
         return str("{}".format(self.email))
+
+
+class Booking(models.Model):
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    user = models.ForeignKey(to='User', on_delete=models.CASCADE)
+    tables = models.ManyToManyField(to='cafe.Table', related_name='bookings')
+
+    class Meta:
+        verbose_name = _('booking')
+        verbose_name_plural = _('bookings')
+
+    def __str__(self):
+        return str("{} {} - {}".format(self.user, self.start_time, self.end_time))

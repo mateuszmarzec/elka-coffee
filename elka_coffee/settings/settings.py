@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'cafe.apps.CafeConfig',
     'bootstrap4',
+    'bootstrap_datepicker_plus'
 ]
 
 MIDDLEWARE = [

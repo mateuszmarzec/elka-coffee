@@ -22,8 +22,8 @@ class Cafe(models.Model):
 class Address(models.Model):
     city = models.CharField(max_length=50)
     street = models.CharField(max_length=50)
-    building_number = models.IntegerField()
-    apartment_number = models.IntegerField(null=True, blank=True)
+    building_number = models.PositiveIntegerField()
+    apartment_number = models.PositiveIntegerField(null=True, blank=True)
     postal_code = models.CharField(max_length=6)
 
     def __str__(self):
@@ -47,11 +47,25 @@ class Shop(models.Model):
     description = models.TextField(blank=True)
 
     def __str__(self):
-        return '{}'.format(self.address)
+        return '{} {}'.format(self.name, self.address)
 
     class Meta:
         verbose_name = _('shop')
         verbose_name_plural = _('shops')
+
+
+class Table(models.Model):
+    shop = models.ForeignKey(to='Shop', on_delete=models.CASCADE)
+    number = models.PositiveIntegerField()
+    max_seats = models.PositiveIntegerField()
+
+    class Meta:
+        unique_together = ('shop', 'number')
+        verbose_name = _('table')
+        verbose_name_plural = _('tables')
+
+    def __str__(self):
+        return '{} number : {} max seats: {}'.format(self.shop, self.number, self.max_seats)
 
 
 @receiver(post_save, sender=Shop)

@@ -4,3 +4,4 @@ django-bootstrap4==0.0.7
 psycopg2-binary==2.7.6.1
 whitenoise==3.3.1
 dj-database-url
+django-bootstrap-datepicker-plus

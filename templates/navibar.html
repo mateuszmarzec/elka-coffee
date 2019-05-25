@@ -10,7 +10,7 @@
                     <a class="p-2 text-muted" href="{% url "users:register" %}">Register</a>
                     <a class="p-2 text-muted" href="{% url "users:login" %}">Sign in</a>
                 {% else %}
-                    <a class="p-2 text-muted" href="">My reservation</a>
+                    <a class="p-2 text-muted" href="{% url "users:bookings" %}">My reservation</a>
                     <a class="p-2 text-muted" href="{% url "users:logout" %}">Sign out</a>
                 {% endif %}
             </nav>

@@ -1,9 +1,14 @@
+import datetime
+
+from bootstrap_datepicker_plus import DatePickerInput, DateTimePickerInput, TimePickerInput
 from django import forms
 from django.contrib.auth import get_user_model
-from django.forms import ModelForm
+from django.db.models import Sum
+from django.forms import ModelForm, Form
 from django.utils.translation import ugettext_lazy as _
 
-from users.models import Employee, Client
+from cafe.models import Shop, Table
+from users.models import Client
 
 User = get_user_model()
 
@@ -50,4 +55,37 @@ class CustomUserCreationForm(ModelForm):
         if commit:
             user.save()
         return user
+
+
+class BookingForm(Form):
+    shop = forms.ModelChoiceField(queryset=Shop.objects.all(), required=True, label='Coffeehouse', initial=1)
+    number_of_guests = forms.IntegerField(required=True, label='How many seats you need', initial=5)
+    date = forms.DateField(required=True, widget=DatePickerInput(format='%m/%d/%Y'))
+    start_time = forms.TimeField(required=True, widget=TimePickerInput(format='H:m'))
+    end_time = forms.TimeField(required=True, widget=TimePickerInput(format='H:m'))
+
+    def clean_start_time(self):
+        date = self.cleaned_data.get('date')
+        start_time = self.cleaned_data.get('start_time')
+        return datetime.datetime(
+            year=date.year, month=date.month, day=date.day, hour=start_time.hour, minute=start_time.minute
+        )
+
+    def clean_end_time(self):
+        date = self.cleaned_data.get('date')
+        end_time = self.cleaned_data.get('end_time')
+        return datetime.datetime(
+            year=date.year, month=date.month, day=date.day, hour=end_time.hour, minute=end_time.minute
+        )
+
+    def clean(self):
+        if self.cleaned_data.get('start_time') > self.cleaned_data.get('end_time'):
+            raise forms.ValidationError('Start time can\'t be later than end time')
+
+        available_tables = Table.objects.filter(shop=self.cleaned_data.get('shop')).exclude(
+            bookings__start_time__range=[self.cleaned_data.get('start_time'), self.cleaned_data.get('end_time')],
+            bookings__end_time__range=[self.cleaned_data.get('start_time'), self.cleaned_data.get('end_time')],
+        )
+        if not available_tables or available_tables.aggregate(Sum('max_seats'))['max_seats__sum'] < self.cleaned_data.get('number_of_guests'):
+            raise forms.ValidationError('No tables available in this coffeehouse for given date')
 

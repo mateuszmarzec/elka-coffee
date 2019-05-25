@@ -3,8 +3,9 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import ugettext_lazy as _
 
+from cafe.models import Table
 from users.forms import CustomUserCreationForm
-from users.models import Employee
+from users.models import Employee, Booking
 
 User = get_user_model()
 
@@ -14,6 +15,11 @@ class EmployeeInline(admin.StackedInline):
     verbose_name = _('Type')
     model = Employee
     can_delete = False
+
+
+class TableInline(admin.StackedInline):
+    model = Table
+    extra = 0
 
 
 @admin.register(User)
@@ -33,3 +39,10 @@ class UserAdmin(UserAdmin):
     )
     readonly_fields = ('last_login', 'date_joined', 'type')
     inlines = (EmployeeInline,)
+
+
+@admin.register(Booking)
+class BookingAdmin(admin.ModelAdmin):
+    list_display = ('start_time', 'end_time', 'user')
+    autocomplete_fields = ('tables',)
+
