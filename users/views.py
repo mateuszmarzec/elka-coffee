@@ -64,7 +64,7 @@ class CreateBookingView(LoginRequiredMixin, FormView):
             bookings__start_time__range=[form.cleaned_data.get('start_time'), form.cleaned_data.get('end_time')],
             bookings__end_time__range=[form.cleaned_data.get('start_time'), form.cleaned_data.get('end_time')],
         )
-        booking.tables.set(shop_tables)
+        booking.tables.set(shop_tables[:2])
         messages.success(request=self.request, message='Reservation successfully created', extra_tags='success')
         return super().form_valid(form)
 
