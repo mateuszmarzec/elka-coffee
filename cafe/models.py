@@ -27,8 +27,8 @@ class Address(models.Model):
     postal_code = models.CharField(max_length=6)
 
     def __str__(self):
-        return '{} {} {} {}'.format(
-            self.city, self.street, self.building_number, self.apartment_number if self.apartment_number else ''
+        return '{} {} {}{}'.format(
+            self.city, self.street, self.building_number, '/'+str(self.apartment_number) if self.apartment_number else ''
         )
 
     class Meta:
