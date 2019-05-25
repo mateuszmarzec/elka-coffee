@@ -7,11 +7,17 @@
     <div class="container" style="max-width: 900px; padding-bottom: 30px">
     <div class="container-fluid">
         <h2 class="h1 text-center mb-3 font-weight-light">My reservations</h2>
-        <p class="text-right"><i class="fa fa-plus fa-2x" aria-hidden="true" data-toggle="modal" data-target="#myModal"></i></p>
+        <p class="text-right"><i class="fa fa-plus fa-lg" aria-hidden="true" data-toggle="modal" data-target="#myModal"></i></p>
         <div class="col-md-12 blog-main">
             <div class="row mb-2">
                 {% if not booking_list %}
-                    Your reservations list is empty
+                    <div class="col-md-12">
+                            <div>
+                              <p class="mb-1">
+                        <p class="text-center">Your reservations list is empty</p>
+                              </p>
+                            </div>
+                        </div>
                 {% else %}
                     {% for booking in booking_list %}
                         <div class="col-md-12">
