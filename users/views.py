@@ -2,15 +2,14 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
-from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import FormView, TemplateView, ListView
 
 from cafe.models import Table
 from users.forms import RegisterForm, BookingForm
-from users.models import Client, Booking
-from users.utils import AnonymousRequiredMixin
+from users.models import Client, Booking, Schedule
+from users.utils import AnonymousRequiredMixin, EmployeeRequiredMixin
 
 User = get_user_model()
 
@@ -20,11 +19,10 @@ class RegisterView(AnonymousRequiredMixin, FormView):
     form_class = RegisterForm
     success_url = reverse_lazy("users:login")
 
-    @transaction.atomic
     def form_valid(self, form):
         form.cleaned_data.pop('password2')
-        client = Client.objects.create(email=form.cleaned_data['email'])
-        User.objects.create_user(**form.cleaned_data, is_active=True, client=client)
+        user = User.objects.create_user(**form.cleaned_data, is_active=True)
+        Client.objects.create(email=form.cleaned_data['email'], user=user)
         return super().form_valid(form)
 
 
@@ -53,7 +51,6 @@ class CreateBookingView(LoginRequiredMixin, FormView):
     success_url = reverse_lazy('users:bookings')
     form_class = BookingForm
 
-    @transaction.atomic
     def form_valid(self, form):
         booking = Booking.objects.create(
             user=self.request.user, end_time=form.cleaned_data.get('end_time'),
@@ -72,3 +69,10 @@ class CreateBookingView(LoginRequiredMixin, FormView):
         for error in form.errors['__all__'].data[0].messages:
             messages.error(request=self.request, message=error, extra_tags='error')
         return HttpResponseRedirect(self.get_success_url())
+
+
+class ScheduleListView(EmployeeRequiredMixin, ListView):
+    template_name = 'users/schedules.html'
+
+    def get_queryset(self):
+        return Schedule.objects.filter(user=self.request.user)

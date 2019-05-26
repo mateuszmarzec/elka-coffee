@@ -7,7 +7,7 @@
     <div class="container" style="max-width: 900px; padding-bottom: 30px">
     <div class="container-fluid">
         <h2 class="h1 text-center mb-3 font-weight-light">My reservations</h2>
-        <p class="text-right"><i class="fa fa-plus fa-lg" aria-hidden="true" data-toggle="modal" data-target="#myModal"></i></p>
+        <p class="text-right"><i class="fa fa-plus fa-lg" aria-hidden="true" data-toggle="modal" data-target="#myModal" style="cursor: pointer"></i></p>
         <div class="col-md-12 blog-main">
             <div class="row mb-2">
                 {% if not booking_list %}
@@ -26,7 +26,7 @@
                                  Coffeehouse name : {{ booking.tables.all.last.shop.name }}
                               </p>
                                 <p class="mb-1">Reservation time : {{ booking.start_time|date:'M d D H:i' }} - {{ booking.end_time|date:'M d D H:i' }}</p>
-                                <p class="mb-1">Your tables : {% for table in booking.tables.all %} {{ table.number }} {% endfor %}</p>
+                                <p class="mb-1">Your tables : {% for table in booking.tables.all %}{{ table.number }}/{% endfor %}</p>
                             </div>
                             <hr class="mb-4">
                         </div>

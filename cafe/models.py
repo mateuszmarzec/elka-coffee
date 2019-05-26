@@ -68,6 +68,65 @@ class Table(models.Model):
         return '{} number : {} max seats: {}'.format(self.shop, self.number, self.max_seats)
 
 
+class Menu(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+    cafe = models.ForeignKey(to='Cafe', on_delete=models.CASCADE, default=1)
+    products = models.ManyToManyField(to='Product', related_name='menus')
+
+    class Meta:
+        verbose_name = _('menu')
+        verbose_name_plural = _('menus')
+
+    def __str__(self):
+        return self.name
+
+
+class Product(models.Model):
+    name = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=5, decimal_places=2)
+    description = models.TextField(blank=True)
+    ingredients = models.ManyToManyField(to='Ingredient', through='ProductIngredient', related_name='products')
+
+    class Meta:
+        verbose_name = _('product')
+        verbose_name_plural = _('products')
+
+    def __str__(self):
+        return self.name
+
+
+class ProductIngredient(models.Model):
+    product = models.ForeignKey(to='Product', on_delete=models.CASCADE)
+    ingredient = models.ForeignKey(to='Ingredient', on_delete=models.CASCADE)
+    amount = models.PositiveIntegerField()
+
+
+class Ingredient(models.Model):
+    name = models.CharField(max_length=100)
+    unit_type = models.ForeignKey(to='UnitType', on_delete=models.SET_NULL, null=True)
+
+    class Meta:
+        verbose_name = _('ingredient')
+        verbose_name_plural = _('ingredients')
+
+    def __str__(self):
+        return '{} ({})'.format(self.name, self.unit_type)
+
+
+class UnitType(models.Model):
+    name = models.CharField(max_length=20)
+
+    class Meta:
+        verbose_name = _('unit type')
+        verbose_name_plural = _('unit types')
+
+    def __str__(self):
+        return self.name
+
+
 @receiver(post_save, sender=Shop)
 def set_cafe(sender, instance, **kwargs):
     sender.objects.filter(id=instance.id).update(cafe=Cafe.objects.first())

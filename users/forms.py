@@ -8,7 +8,7 @@ from django.forms import ModelForm, Form
 from django.utils.translation import ugettext_lazy as _
 
 from cafe.models import Shop, Table
-from users.models import Client
+from users.models import Client, Salary, Schedule
 
 User = get_user_model()
 
@@ -89,3 +89,18 @@ class BookingForm(Form):
         if not available_tables or available_tables.aggregate(Sum('max_seats'))['max_seats__sum'] < self.cleaned_data.get('number_of_guests'):
             raise forms.ValidationError('No tables available in this coffeehouse for given date')
 
+
+class SalaryForm(forms.ModelForm):
+    user = forms.ModelChoiceField(queryset=User.objects.filter(employee__isnull=False), label='Employee')
+
+    class Meta:
+        model = Salary
+        fields = '__all__'
+
+
+class ScheduleForm(forms.ModelForm):
+    user = forms.ModelChoiceField(queryset=User.objects.filter(employee__isnull=False), label='Employee')
+
+    class Meta:
+        model = Schedule
+        fields = '__all__'
