@@ -1,7 +1,9 @@
+from datetime import datetime
+
 from django import forms
 from django.contrib.auth import get_user_model
 
-from cafe.models import Order, Shop, StorageState
+from cafe.models import Order, Shop, StorageState, Menu
 
 User = get_user_model()
 
@@ -17,6 +19,9 @@ class OrderForm(forms.ModelForm):
 
 class CreateOrderForm(forms.ModelForm):
     shop = forms.ModelChoiceField(queryset=Shop.objects.all(), label='Coffeehouse', required=True)
+    products = forms.ModelMultipleChoiceField(
+        queryset=Menu.objects.filter(start_date__lte=datetime.today(), end_date__gte=datetime.today()).last().products
+    )
 
     class Meta:
         model = Order

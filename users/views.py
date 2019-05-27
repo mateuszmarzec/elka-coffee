@@ -75,4 +75,4 @@ class ScheduleListView(EmployeeRequiredMixin, ListView):
     template_name = 'users/schedules.html'
 
     def get_queryset(self):
-        return Schedule.objects.filter(user=self.request.user)
+        return Schedule.objects.filter(user=self.request.user, approve_date__isnull=False)

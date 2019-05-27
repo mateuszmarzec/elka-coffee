@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -84,6 +86,10 @@ class Menu(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def is_current(self):
+        return self.start_date <= datetime.today() and self.end_date <= datetime.today()
 
 
 class Product(models.Model):
