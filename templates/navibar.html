@@ -12,8 +12,11 @@
                 {% else %}
                     {% if user.employee %}
                         <a class="p-2 text-muted" href="{% url "users:schedules" %}">My schedules</a>
+                        <a class="p-2 text-muted" href="{% url "cafe:orders" %}">Orders</a>
+                        <a class="p-2 text-muted" href="{% url "cafe:storage" %}">Storage state</a>
                     {% endif %}
-                    <a class="p-2 text-muted" href="{% url "users:bookings" %}">My reservation</a>
+                    <a class="p-2 text-muted" href="{% url "users:bookings" %}">{% if user.client %}My{% endif %} Reservations</a>
+                    <a class="p-2 text-muted" href="{% url "cafe:online-orders" %}">{% if user.client %}My{% else %}Online{% endif %} Orders</a>
                     <a class="p-2 text-muted" href="{% url "users:logout" %}">Sign out</a>
                 {% endif %}
             </nav>

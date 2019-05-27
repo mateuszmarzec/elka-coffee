@@ -80,6 +80,7 @@ class Menu(models.Model):
     class Meta:
         verbose_name = _('menu')
         verbose_name_plural = _('menus')
+        ordering = ('-start_date', '-end_date')
 
     def __str__(self):
         return self.name
@@ -96,7 +97,7 @@ class Product(models.Model):
         verbose_name_plural = _('products')
 
     def __str__(self):
-        return self.name
+        return '{} ({} PLN)'.format(self.name, self.price)
 
 
 class ProductIngredient(models.Model):
@@ -109,6 +110,9 @@ class StorageState(models.Model):
     shop = models.ForeignKey(to='Shop', on_delete=models.CASCADE)
     ingredient = models.ForeignKey(to='Ingredient', on_delete=models.CASCADE)
     amount = models.PositiveIntegerField()
+
+    class Meta:
+        unique_together = ('shop', 'ingredient')
 
 
 class Ingredient(models.Model):
@@ -138,18 +142,20 @@ class Order(models.Model):
     amount = models.DecimalField(max_digits=8, decimal_places=2)
     timestamp = models.DateTimeField(auto_now_add=True)
     client = models.ForeignKey(
-        to='users.User', on_delete=models.CASCADE, null=True, blank=True, related_name='order_by'
+        to='users.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='order_by'
     )
     employee = models.ForeignKey(
         to='users.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='accepted_by'
     )
-    order_status = models.ForeignKey(to='OrderStatus', on_delete=models.SET_NULL, null=True, blank=True)
-    payment_type = models.ForeignKey(to='PaymentType', on_delete=models.SET_NULL, null=True, blank=True)
-    products = models.ManyToManyField(to='Product', blank=True, related_name='orders')
+    products = models.ManyToManyField(to='Product', related_name='orders')
+    shop = models.ForeignKey(to='Shop', on_delete=models.CASCADE, null=True, blank=True)
+    order_status = models.ForeignKey(to='OrderStatus', on_delete=models.SET_NULL, null=True)
+    payment_type = models.ForeignKey(to='PaymentType', on_delete=models.SET_NULL, null=True)
 
     class Meta:
         verbose_name = _('order')
         verbose_name_plural = _('orders')
+        ordering = ('-timestamp',)
 
     def __str__(self):
         return '{} {} {} {}'.format(self.amount, self.client, self.payment_type, self.payment_type)
@@ -184,6 +190,7 @@ class Supply(models.Model):
     ingredients = models.ManyToManyField(to='Ingredient', through='SuppliedIngredient', related_name='supplies')
 
     class Meta:
+        ordering = ('-date',)
         verbose_name = _('supply')
         verbose_name_plural = _('supplies')
 

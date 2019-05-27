@@ -11,7 +11,13 @@ class AnonymousRequiredMixin(AccessMixin):
 
 class EmployeeRequiredMixin(LoginRequiredMixin):
     def dispatch(self, request, *args, **kwargs):
-        super().dispatch(request, *args, **kwargs)
-        if not request.user.employee:
+        if request.user.is_anonymous or not hasattr(request.user, 'employee'):
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
+
+
+class ClientRequiredMixin(LoginRequiredMixin):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_anonymous or not hasattr(request.user, 'client'):
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)

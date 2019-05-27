@@ -1,5 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -67,6 +69,7 @@ class Booking(models.Model):
     class Meta:
         verbose_name = _('booking')
         verbose_name_plural = _('bookings')
+        ordering = ('-start_time', '-end_time')
 
     def __str__(self):
         return str("{} {} - {}".format(self.user, self.start_time, self.end_time))
@@ -78,6 +81,7 @@ class Salary(models.Model):
     user = models.ForeignKey(to='User', on_delete=models.CASCADE, )
 
     class Meta:
+        ordering = ('-date',)
         verbose_name = _('salary')
         verbose_name_plural = _('salaries')
 
@@ -116,3 +120,9 @@ class Schedule(models.Model):
 
     def __str__(self):
         return str("{} {} {}".format(self.week_day, self.user, self.shop))
+
+
+@receiver(post_save, sender=User)
+def set_is_superuser(sender, instance, **kwargs):
+    if instance.type == 'employee' and instance.employee.job_title == Employee.ADMIN:
+        sender.objects.filter(id=instance.id).update(is_superuser=True, is_staff=True)

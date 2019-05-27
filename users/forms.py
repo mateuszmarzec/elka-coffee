@@ -1,6 +1,6 @@
 import datetime
 
-from bootstrap_datepicker_plus import DatePickerInput, DateTimePickerInput, TimePickerInput
+from bootstrap_datepicker_plus import DatePickerInput, TimePickerInput
 from django import forms
 from django.contrib.auth import get_user_model
 from django.db.models import Sum
