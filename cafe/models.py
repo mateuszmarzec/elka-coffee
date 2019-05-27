@@ -45,6 +45,7 @@ class Shop(models.Model):
     address = models.OneToOneField(to='Address', on_delete=models.SET_NULL, null=True, blank=True)
     cafe = models.ForeignKey(to='Cafe', on_delete=models.SET_NULL, blank=True, null=True)
     description = models.TextField(blank=True)
+    ingredients = models.ManyToManyField(to='Ingredient', through='StorageState', related_name='shops')
 
     def __str__(self):
         return '{} {}'.format(self.name, self.address)
@@ -104,6 +105,12 @@ class ProductIngredient(models.Model):
     amount = models.PositiveIntegerField()
 
 
+class StorageState(models.Model):
+    shop = models.ForeignKey(to='Shop', on_delete=models.CASCADE)
+    ingredient = models.ForeignKey(to='Ingredient', on_delete=models.CASCADE)
+    amount = models.PositiveIntegerField()
+
+
 class Ingredient(models.Model):
     name = models.CharField(max_length=100)
     unit_type = models.ForeignKey(to='UnitType', on_delete=models.SET_NULL, null=True)
@@ -125,6 +132,69 @@ class UnitType(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Order(models.Model):
+    amount = models.DecimalField(max_digits=8, decimal_places=2)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    client = models.ForeignKey(
+        to='users.User', on_delete=models.CASCADE, null=True, blank=True, related_name='order_by'
+    )
+    employee = models.ForeignKey(
+        to='users.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='accepted_by'
+    )
+    order_status = models.ForeignKey(to='OrderStatus', on_delete=models.SET_NULL, null=True, blank=True)
+    payment_type = models.ForeignKey(to='PaymentType', on_delete=models.SET_NULL, null=True, blank=True)
+    products = models.ManyToManyField(to='Product', blank=True, related_name='orders')
+
+    class Meta:
+        verbose_name = _('order')
+        verbose_name_plural = _('orders')
+
+    def __str__(self):
+        return '{} {} {} {}'.format(self.amount, self.client, self.payment_type, self.payment_type)
+
+
+class OrderStatus(models.Model):
+    status = models.CharField(max_length=20)
+
+    class Meta:
+        verbose_name = _('order status')
+        verbose_name_plural = _('order statuses')
+
+    def __str__(self):
+        return self.status
+
+
+class PaymentType(models.Model):
+    type = models.CharField(max_length=50)
+
+    class Meta:
+        verbose_name = _('payment type')
+        verbose_name_plural = _('payment types')
+
+    def __str__(self):
+        return self.type
+
+
+class Supply(models.Model):
+    date = models.DateField()
+    description = models.TextField(blank=True)
+    shop = models.ForeignKey(to='Shop', on_delete=models.CASCADE)
+    ingredients = models.ManyToManyField(to='Ingredient', through='SuppliedIngredient', related_name='supplies')
+
+    class Meta:
+        verbose_name = _('supply')
+        verbose_name_plural = _('supplies')
+
+    def __str__(self):
+        return ''.format(self.date, self.shop)
+
+
+class SuppliedIngredient(models.Model):
+    supply = models.ForeignKey(to='Supply', on_delete=models.CASCADE)
+    ingredient = models.ForeignKey(to='Ingredient', on_delete=models.CASCADE)
+    amount = models.PositiveIntegerField()
 
 
 @receiver(post_save, sender=Shop)
