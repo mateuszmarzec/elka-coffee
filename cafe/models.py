@@ -103,13 +103,13 @@ class Product(models.Model):
 class ProductIngredient(models.Model):
     product = models.ForeignKey(to='Product', on_delete=models.CASCADE)
     ingredient = models.ForeignKey(to='Ingredient', on_delete=models.CASCADE)
-    amount = models.PositiveIntegerField()
+    amount = models.DecimalField(max_digits=8, decimal_places=2)
 
 
 class StorageState(models.Model):
     shop = models.ForeignKey(to='Shop', on_delete=models.CASCADE)
     ingredient = models.ForeignKey(to='Ingredient', on_delete=models.CASCADE)
-    amount = models.PositiveIntegerField()
+    amount = models.DecimalField(max_digits=8, decimal_places=2)
 
     class Meta:
         unique_together = ('shop', 'ingredient')
