@@ -124,5 +124,5 @@ class Schedule(models.Model):
 
 @receiver(post_save, sender=User)
 def set_is_superuser(sender, instance, **kwargs):
-    if hasattr(instance, 'employeelo') and instance.employee.job_title == Employee.ADMIN:
+    if hasattr(instance, 'employee') and instance.employee.job_title == Employee.ADMIN:
         sender.objects.filter(id=instance.id).update(is_superuser=True, is_staff=True)
