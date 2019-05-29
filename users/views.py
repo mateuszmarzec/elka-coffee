@@ -1,14 +1,17 @@
+from datetime import datetime
+
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import FormView, TemplateView, ListView
 
 from cafe.models import Table
-from users.forms import RegisterForm, BookingForm
-from users.models import Client, Booking, Schedule
+from users.forms import RegisterForm, BookingForm, AddScheduleForm
+from users.models import Client, Booking, Schedule, Employee
 from users.utils import AnonymousRequiredMixin, EmployeeRequiredMixin
 
 User = get_user_model()
@@ -75,4 +78,43 @@ class ScheduleListView(EmployeeRequiredMixin, ListView):
     template_name = 'users/schedules.html'
 
     def get_queryset(self):
-        return Schedule.objects.filter(user=self.request.user, approve_date__isnull=False)
+        return Schedule.objects.filter(
+            user=self.request.user, approve_date__isnull=False
+        ) if self.request.user.employee.job_title != Employee.ADMIN else Schedule.objects.all()
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(object_list=None, **kwargs)
+        context.update({'form': AddScheduleForm})
+        return context
+
+
+class AddScheduleView(EmployeeRequiredMixin, FormView):
+    http_method_names = ['post']
+    success_url = reverse_lazy('users:schedules')
+    form_class = AddScheduleForm
+
+    def form_valid(self, form):
+        Schedule.objects.create(user=self.request.user, **form.cleaned_data)
+        messages.success(request=self.request, message='Schedule successfully created', extra_tags='success')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        for error in form.errors['__all__'].data[0].messages:
+            messages.error(request=self.request, message=error, extra_tags='error')
+        return HttpResponseRedirect(self.get_success_url())
+
+
+class UpdateScheduleView(EmployeeRequiredMixin, FormView):
+    http_method_names = ['post']
+    success_url = reverse_lazy('users:schedules')
+
+    def post(self, request, *args, **kwargs):
+        schedule = get_object_or_404(Schedule, pk=kwargs.get('pk'))
+        if request.POST.get('change') == 'Cancel':
+            schedule.delete()
+            messages.success(request=self.request, message='Schedule successfully deleted', extra_tags='success')
+        else:
+            schedule.approve_date = datetime.today().date()
+            schedule.save()
+            messages.success(request=self.request, message='Schedule successfully updated', extra_tags='success')
+        return HttpResponseRedirect(self.success_url)

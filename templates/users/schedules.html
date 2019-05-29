@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% load bootstrap4 %}
 {% block content %}
 
     <div class="container" style="max-width: 900px; padding-bottom: 30px">
     <div class="container-fluid">
-        <h2 class="h1 text-center mb-3 font-weight-light">My schedules</h2>
+        <h2 class="h1 text-center mb-3 font-weight-light">{% if not user.is_superuser %}My{% endif %} Schedules</h2>
+            {% if not user.is_superuser %}<p class="text-right"><i class="fa fa-plus fa-lg" aria-hidden="true" data-toggle="modal" data-target="#myModal" style="cursor: pointer"></i></p>{% endif %}
         <div class="col-md-12 blog-main">
             <div class="row mb-2">
                 {% if not schedule_list %}
@@ -24,7 +25,19 @@
                                  Coffeehouse name : {{ schedule.shop.name }}
                               </p>
                                 <p class="mb-1">Day of week : {{ schedule.get_week_day_display }}</p>
-                                <p class="mb-1">Start time : {{ schedule.start_time|time:'H:i' }} - {{ schedule.end_time|time:'H:i' }}</p>
+                                <p class="mb-1">Shift time : {{ schedule.start_time|time:'H:i' }} - {{ schedule.end_time|time:'H:i' }}</p>
+                                <span class="mb-1">Status : {% if schedule.approve_date %} ACCEPTED {% else %} PENDING {% endif %}
+                                {% if user.is_superuser %}
+                                    <form method="post" action="{% url "users:update-schedules" schedule.pk %}" style="display: inherit; margin-block-end: 0em;">
+                                        {% csrf_token %}
+                                        <input name="change" class="btn btn-sm btn-danger btn-primary" type="submit" value="Cancel" style="float: right;">
+                                    </form>
+                                <form method="post" action="{% url "users:update-schedules" schedule.pk %}" style="display: inherit; margin-block-end: 0em;">
+                                    {% csrf_token %}
+                                    <input name="change" class="btn btn-sm mybutton btn-primary" type="submit" value="Accept" style="float: right; margin-right: 5px">
+                                </form>
+                                {% endif %}
+                                </span>
                             </div>
                             <hr class="mb-4">
                         </div>
@@ -34,4 +47,33 @@
         </div>
     </div>
     </div>
+
+        <!-- The Modal -->
+<div class="modal" id="myModal">
+    <form method="post" class="form" action="{% url "users:add-schedules" %}">
+        {% csrf_token %}
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h3 class="h2 text-center mb-0 font-weight-light">Create schedule request</h3>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+          {{ form.media }}
+            {% bootstrap_form form %}
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+          {% bootstrap_button "Submit" button_type="submit" size='small' button_class='btn btn-lg btn-primary btn-block mybutton'%}
+      </div>
+
+    </div>
+  </div>
+    </form>
+</div>
 {% endblock %}

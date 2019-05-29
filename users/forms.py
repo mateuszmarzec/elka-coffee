@@ -104,3 +104,13 @@ class ScheduleForm(forms.ModelForm):
     class Meta:
         model = Schedule
         fields = '__all__'
+
+
+class AddScheduleForm(forms.ModelForm):
+    start_time = forms.TimeField(required=True, widget=TimePickerInput(format='H:m'))
+    end_time = forms.TimeField(required=True, widget=TimePickerInput(format='H:m'))
+    shop = forms.ModelChoiceField(queryset=Shop.objects.all(), label='Coffeehouse')
+
+    class Meta:
+        model = Schedule
+        exclude = ('user', 'approve_date')

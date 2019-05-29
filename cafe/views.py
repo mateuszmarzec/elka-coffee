@@ -8,8 +8,8 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, TemplateView, FormView
 
-from cafe.forms import CreateOrderForm
-from cafe.models import Shop, Cafe, Menu, Order, OrderStatus, StorageState
+from cafe.forms import CreateOrderForm, SupplyForm, SupplyIngredientFormSet
+from cafe.models import Shop, Cafe, Menu, Order, OrderStatus, StorageState, Supply, SuppliedIngredient
 from users.utils import EmployeeRequiredMixin
 
 
@@ -123,3 +123,39 @@ class UpdateOrderView(EmployeeRequiredMixin, FormView):
 class StorageView(EmployeeRequiredMixin, ListView):
     template_name = 'cafe/storage.html'
     queryset = Shop.objects.all()
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(object_list=None, **kwargs)
+        context.update({'form': SupplyForm, 'formset': SupplyIngredientFormSet})
+        return context
+
+
+class CreateSupplyView(EmployeeRequiredMixin, FormView):
+    http_method_names = ['post']
+    success_url = reverse_lazy('cafe:storage')
+    form_class = SupplyForm
+
+    def form_valid(self, form):
+        supply = Supply.objects.create(date=datetime.today().date(), **form.cleaned_data)
+        formset = SupplyIngredientFormSet(self.request.POST)
+        if formset.is_valid():
+            for f in formset:
+                SuppliedIngredient.objects.create(supply=supply, **f.cleaned_data)
+                ss = StorageState.objects.filter(
+                    shop=form.cleaned_data.get('shop'), ingredient=f.cleaned_data.get('ingredient')
+                ).last()
+                if ss:
+                    ss.amount = ss.amount + f.cleaned_data.get('amount')
+                    ss.save()
+                else:
+                    StorageState.objects.create(
+                        shop=form.cleaned_data.get('shop'), ingredient=f.cleaned_data.get('ingredient'), amount=f.cleaned_data.get('amount')
+                    )
+
+            messages.success(request=self.request, message='Supply successfully ordered', extra_tags='success')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        for error in form.errors['__all__'].data[0].messages:
+            messages.error(request=self.request, message=error, extra_tags='error')
+        return HttpResponseRedirect(self.get_success_url())

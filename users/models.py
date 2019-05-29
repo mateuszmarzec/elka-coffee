@@ -26,12 +26,12 @@ class User(AbstractUser):
 
 class Employee(models.Model):
     ADMIN = 'admin'
-    BARISTA = 'barista'
+    BARIST = 'barist'
     CASHIER = 'cashier'
 
     JOB_CHOICES = (
         (ADMIN, 'Admin'),
-        (BARISTA, 'Barista'),
+        (BARIST, 'Barist'),
         (CASHIER, 'Cashier'),
     )
 
@@ -117,6 +117,7 @@ class Schedule(models.Model):
     class Meta:
         verbose_name = _('schedule')
         verbose_name_plural = _('schedules')
+        ordering = ('-id',)
 
     def __str__(self):
         return str("{} {} {}".format(self.week_day, self.user, self.shop))

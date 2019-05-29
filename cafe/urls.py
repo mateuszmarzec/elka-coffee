@@ -1,7 +1,7 @@
 from django.urls import path
 
 from cafe.views import ShopsView, CafeView, MenuView, UpdateOrderView, \
-    OnlineOrderListView, OrderListView, CreateOrderView, StorageView
+    OnlineOrderListView, OrderListView, CreateOrderView, StorageView, CreateSupplyView
 
 app_name = 'cafe'
 urlpatterns = [
@@ -13,4 +13,5 @@ urlpatterns = [
     path('add-order', CreateOrderView.as_view(), name="add-order"),
     path('change-order/<int:pk>', UpdateOrderView.as_view(), name="change-order"),
     path('storage', StorageView.as_view(), name="storage"),
+    path('add-supply', CreateSupplyView.as_view(), name="add-supply"),
 ]

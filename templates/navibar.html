@@ -11,7 +11,7 @@
                     <a class="p-2 text-muted" href="{% url "users:login" %}">Sign in</a>
                 {% else %}
                     {% if user.employee %}
-                        <a class="p-2 text-muted" href="{% url "users:schedules" %}">My schedules</a>
+                        <a class="p-2 text-muted" href="{% url "users:schedules" %}">{% if not user.is_superuser %}My{% endif %} Schedules</a>
                         <a class="p-2 text-muted" href="{% url "cafe:orders" %}">Orders</a>
                         <a class="p-2 text-muted" href="{% url "cafe:storage" %}">Storage state</a>
                     {% endif %}

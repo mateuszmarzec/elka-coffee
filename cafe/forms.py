@@ -2,8 +2,9 @@ from datetime import datetime
 
 from django import forms
 from django.contrib.auth import get_user_model
+from django.forms import formset_factory, inlineformset_factory
 
-from cafe.models import Order, Shop, StorageState, Menu
+from cafe.models import Order, Shop, StorageState, Menu, Supply, SuppliedIngredient
 
 User = get_user_model()
 
@@ -37,3 +38,22 @@ class CreateOrderForm(forms.ModelForm):
                     if storage.amount > 0:
                         return super().clean()
                 raise forms.ValidationError('Not enough ingredients to prepare these products ({})'.format(ingredient.name))
+
+
+class SupplyIngredientForm(forms.ModelForm):
+    class Meta:
+        model = SuppliedIngredient
+        exclude = ('supply',)
+
+
+SupplyIngredientFormSet = formset_factory(
+    form=SupplyIngredientForm, extra=1, can_delete=False
+)
+
+
+class SupplyForm(forms.ModelForm):
+    ingredients = formset_factory(SupplyIngredientForm)
+
+    class Meta:
+        model = Supply
+        exclude = ('date', 'ingredients')
