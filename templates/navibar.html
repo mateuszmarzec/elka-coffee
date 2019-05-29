@@ -14,6 +14,9 @@
                         <a class="p-2 text-muted" href="{% url "users:schedules" %}">{% if not user.is_superuser %}My{% endif %} Schedules</a>
                         <a class="p-2 text-muted" href="{% url "cafe:orders" %}">Orders</a>
                         <a class="p-2 text-muted" href="{% url "cafe:storage" %}">Storage state</a>
+                        {% if user.employee.job_title == 'admin' %}
+                            <a class="p-2 text-muted" href="{% url "users:supplies" %}">Supplies</a>
+                        {% endif %}
                     {% endif %}
                     <a class="p-2 text-muted" href="{% url "users:bookings" %}">{% if user.client %}My{% endif %} Reservations</a>
                     <a class="p-2 text-muted" href="{% url "cafe:online-orders" %}">{% if user.client %}My{% else %}Online{% endif %} Orders</a>

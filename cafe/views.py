@@ -10,7 +10,8 @@ from django.views.generic import ListView, TemplateView, FormView
 
 from cafe.forms import CreateOrderForm, SupplyForm, SupplyIngredientFormSet
 from cafe.models import Shop, Cafe, Menu, Order, OrderStatus, StorageState, Supply, SuppliedIngredient
-from users.utils import EmployeeRequiredMixin
+from users.models import Salary
+from users.utils import EmployeeRequiredMixin, AdminRequiredMixin
 
 
 class ShopsView(ListView):
@@ -159,3 +160,21 @@ class CreateSupplyView(EmployeeRequiredMixin, FormView):
         for error in form.errors['__all__'].data[0].messages:
             messages.error(request=self.request, message=error, extra_tags='error')
         return HttpResponseRedirect(self.get_success_url())
+
+
+class SupplyListView(AdminRequiredMixin, ListView):
+    template_name = 'cafe/supplies.html'
+    queryset = Supply.objects.all()
+    ordering = ('-date', '-pk')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(object_list=None, **kwargs)
+        context.update({'form': SupplyForm, 'formset': SupplyIngredientFormSet})
+        return context
+
+
+class SalaryListView(EmployeeRequiredMixin, ListView):
+    template_name = 'cafe/salaries.html'
+
+    def get_queryset(self):
+        return Salary.objects.filter(user=self.request.user)
