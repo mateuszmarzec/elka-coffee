@@ -10,6 +10,7 @@ from django.views.generic import ListView, TemplateView, FormView
 
 from cafe.forms import CreateOrderForm, SupplyForm, SupplyIngredientFormSet
 from cafe.models import Shop, Cafe, Menu, Order, OrderStatus, StorageState, Supply, SuppliedIngredient
+from users.forms import AddSalaryForm
 from users.models import Salary, Employee
 from users.utils import EmployeeRequiredMixin, AdminRequiredMixin
 
@@ -178,3 +179,23 @@ class SalaryListView(EmployeeRequiredMixin, ListView):
 
     def get_queryset(self):
         return Salary.objects.all() if self.request.user.employee.job_title == Employee.ADMIN else Salary.objects.filter(user=self.request.user)
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(object_list=None, **kwargs)
+        context.update({'form': AddSalaryForm})
+        return context
+
+
+class AddSalaryView(AdminRequiredMixin, FormView):
+    http_method_names = ['post']
+    success_url = reverse_lazy('users:salaries')
+    form_class = AddSalaryForm
+
+    def form_valid(self, form):
+        Salary.objects.create(**form.cleaned_data)
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        for error in form.errors['__all__'].data[0].messages:
+            messages.error(request=self.request, message=error, extra_tags='error')
+        return HttpResponseRedirect(self.get_success_url())

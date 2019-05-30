@@ -98,6 +98,15 @@ class SalaryForm(forms.ModelForm):
         fields = '__all__'
 
 
+class AddSalaryForm(forms.ModelForm):
+    user = forms.ModelChoiceField(queryset=User.objects.filter(employee__isnull=False), label='Employee')
+    date = forms.DateField(required=True, widget=DatePickerInput(format='%m/%d/%Y'))
+
+    class Meta:
+        model = Salary
+        fields = '__all__'
+
+
 class ScheduleForm(forms.ModelForm):
     user = forms.ModelChoiceField(queryset=User.objects.filter(employee__isnull=False), label='Employee')
 

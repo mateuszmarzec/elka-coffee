@@ -24,6 +24,9 @@
                               <p class="mb-1">
                                  Coffeehouse name : {{ schedule.shop.name }}
                               </p>
+                            {% if user.is_superuser %}
+                                <p class="mb-1">Employee : {{ schedule.user }}</p>
+                            {% endif %}
                                 <p class="mb-1">Day of week : {{ schedule.get_week_day_display }}</p>
                                 <p class="mb-1">Shift time : {{ schedule.start_time|time:'H:i' }} - {{ schedule.end_time|time:'H:i' }}</p>
                                 <span class="mb-1">Status : {% if schedule.approve_date %} ACCEPTED {% else %} PENDING {% endif %}

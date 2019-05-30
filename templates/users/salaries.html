@@ -6,9 +6,10 @@
     <div class="container" style="max-width: 900px; padding-bottom: 30px">
     <div class="container-fluid">
         <h2 class="h1 text-center mb-3 font-weight-light">{% if not user.is_superuser %}My{% endif %} Salaries</h2>
+                {% if user.employee.job_title == 'admin' %}<p class="text-right"><i class="fa fa-plus fa-lg" aria-hidden="true" data-toggle="modal" data-target="#myModal" style="cursor: pointer"></i></p>{% endif %}
         <div class="col-md-12 blog-main">
             <div class="row mb-2">
-                {% if not schedule_list %}
+                {% if not salary_list %}
                     <div class="col-md-12">
                             <div>
                               <p class="mb-1">
@@ -20,11 +21,13 @@
                     {% for salary in salary_list %}
                         <div class="col-md-12">
                             <div>
-                              <p class="mb-1">
-                                 Amount : {{ salary.amount }}
+                                <p class="mb-1">
+                                 Employee : {{ salary.user }}
                               </p>
-                                <p class="mb-1">Day of week : {{ schedule.get_week_day_display }}</p>
-                                <p class="mb-1">Shift time : {{ salary.date|date:'M d D' }}</p>
+                              <p class="mb-1">
+                                 Amount : {{ salary.amount }} PLN
+                              </p>
+                                <div class="mb-0 text-muted" id="post-date">Day of week : {{ salary.date|date:'M d D' }}</div>
                             </div>
                             <hr class="mb-4">
                         </div>
@@ -34,4 +37,34 @@
         </div>
     </div>
     </div>
+
+
+        <!-- The Modal -->
+<div class="modal" id="myModal">
+    <form method="post" class="form" action="{% url "users:add-salary" %}">
+        {% csrf_token %}
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h3 class="h2 text-center mb-0 font-weight-light">Create salary</h3>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+          {{ form.media }}
+            {% bootstrap_form form %}
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+          {% bootstrap_button "Submit" button_type="submit" size='small' button_class='btn btn-lg btn-primary btn-block mybutton'%}
+      </div>
+
+    </div>
+  </div>
+    </form>
+</div>
 {% endblock %}
