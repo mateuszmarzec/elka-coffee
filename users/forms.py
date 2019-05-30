@@ -114,3 +114,14 @@ class AddScheduleForm(forms.ModelForm):
     class Meta:
         model = Schedule
         exclude = ('user', 'approve_date')
+
+
+class AddAdminScheduleForm(forms.ModelForm):
+    start_time = forms.TimeField(required=True, widget=TimePickerInput(format='H:m'))
+    end_time = forms.TimeField(required=True, widget=TimePickerInput(format='H:m'))
+    shop = forms.ModelChoiceField(queryset=Shop.objects.all(), label='Coffeehouse', required=True)
+    user = forms.ModelChoiceField(queryset=User.objects.filter(employee__isnull=False), required=True, label='Employee')
+
+    class Meta:
+        model = Schedule
+        exclude = ('approve_date',)

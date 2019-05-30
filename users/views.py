@@ -10,9 +10,9 @@ from django.urls import reverse_lazy
 from django.views.generic import FormView, TemplateView, ListView
 
 from cafe.models import Table
-from users.forms import RegisterForm, BookingForm, AddScheduleForm
+from users.forms import RegisterForm, BookingForm, AddScheduleForm, AddAdminScheduleForm
 from users.models import Client, Booking, Schedule, Employee
-from users.utils import AnonymousRequiredMixin, EmployeeRequiredMixin
+from users.utils import AnonymousRequiredMixin, EmployeeRequiredMixin, AdminRequiredMixin
 
 User = get_user_model()
 
@@ -84,7 +84,7 @@ class ScheduleListView(EmployeeRequiredMixin, ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(object_list=None, **kwargs)
-        context.update({'form': AddScheduleForm})
+        context.update({'form': AddAdminScheduleForm if self.request.user.employee.job_title == Employee.ADMIN else AddScheduleForm})
         return context
 
 
@@ -118,3 +118,19 @@ class UpdateScheduleView(EmployeeRequiredMixin, FormView):
             schedule.save()
             messages.success(request=self.request, message='Schedule successfully updated', extra_tags='success')
         return HttpResponseRedirect(self.success_url)
+
+
+class AddScheduleManagerView(AdminRequiredMixin, FormView):
+    http_method_names = ['post']
+    success_url = reverse_lazy('users:schedules')
+    form_class = AddAdminScheduleForm
+
+    def form_valid(self, form):
+        Schedule.objects.create(**form.cleaned_data, approve_date=datetime.now())
+        messages.success(request=self.request, message='Schedule successfully created', extra_tags='success')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        for error in form.errors['__all__'].data[0].messages:
+            messages.error(request=self.request, message=error, extra_tags='error')
+        return HttpResponseRedirect(self.get_success_url())

@@ -4,7 +4,7 @@ from django.urls import path
 
 from cafe.views import SupplyListView, SalaryListView
 from users.views import RegisterView, IndexView, LoginView, BookingListView, CreateBookingView, ScheduleListView, \
-    AddScheduleView, UpdateScheduleView
+    AddScheduleView, UpdateScheduleView, AddScheduleManagerView
 
 app_name = 'users'
 urlpatterns = [
@@ -13,6 +13,7 @@ urlpatterns = [
     path('my-reservations', BookingListView.as_view(), name="bookings"),
     path('schedules', ScheduleListView.as_view(), name="schedules"),
     path('add-schedules', AddScheduleView.as_view(), name="add-schedules"),
+    path('add-manager-schedules', AddScheduleManagerView.as_view(), name="add-manager-schedules"),
     path('update-schedules/<int:pk>', UpdateScheduleView.as_view(), name="update-schedules"),
     path('add-reservations', CreateBookingView.as_view(), name="add-booking"),
     path('supplies', SupplyListView.as_view(), name="supplies"),

@@ -36,7 +36,6 @@ class ShopAdmin(admin.ModelAdmin):
 class CafeAdmin(admin.ModelAdmin):
     list_display = ('name', 'email', 'address')
     autocomplete_fields = ('address',)
-    readonly_fields = ('name',)
 
 
 @admin.register(Address)
