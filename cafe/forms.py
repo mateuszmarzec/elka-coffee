@@ -41,6 +41,8 @@ class CreateOrderForm(forms.ModelForm):
 
 
 class SupplyIngredientForm(forms.ModelForm):
+    amount = forms.IntegerField(required=True)
+
     class Meta:
         model = SuppliedIngredient
         exclude = ('supply',)
