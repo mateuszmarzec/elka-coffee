@@ -35,10 +35,12 @@
                                         {% csrf_token %}
                                         <input name="change" class="btn btn-sm btn-danger btn-primary" type="submit" value="Cancel" style="float: right;">
                                     </form>
+                                    {% if not schedule.approve_date %}
                                 <form method="post" action="{% url "users:update-schedules" schedule.pk %}" style="display: inherit; margin-block-end: 0em;">
                                     {% csrf_token %}
                                     <input name="change" class="btn btn-sm mybutton btn-primary" type="submit" value="Accept" style="float: right; margin-right: 5px">
                                 </form>
+                                        {% endif %}
                                 {% endif %}
                                 </span>
                             </div>
