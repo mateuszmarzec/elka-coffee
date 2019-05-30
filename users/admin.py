@@ -4,13 +4,14 @@ from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import ugettext_lazy as _
 
 from cafe.models import Table
-from users.forms import CustomUserCreationForm, SalaryForm, ScheduleForm
+from users.forms import CustomUserCreationForm, SalaryForm, ScheduleForm, CustomEmployeeForm
 from users.models import Employee, Booking, Client, Salary, Schedule
 
 User = get_user_model()
 
 
 class EmployeeInline(admin.StackedInline):
+    form = CustomEmployeeForm
     verbose_name_plural = _('employee info')
     verbose_name = _('Type')
     model = Employee

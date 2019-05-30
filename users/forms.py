@@ -8,7 +8,7 @@ from django.forms import ModelForm, Form
 from django.utils.translation import ugettext_lazy as _
 
 from cafe.models import Shop, Table
-from users.models import Client, Salary, Schedule
+from users.models import Client, Salary, Schedule, Employee
 
 User = get_user_model()
 
@@ -55,6 +55,14 @@ class CustomUserCreationForm(ModelForm):
         if commit:
             user.save()
         return user
+
+
+class CustomEmployeeForm(ModelForm):
+    account_number = forms.CharField(widget=forms.NumberInput())
+
+    class Meta:
+        fields = '__all__'
+        model = Employee
 
 
 class BookingForm(Form):
