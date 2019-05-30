@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
@@ -94,6 +95,10 @@ class AddScheduleView(EmployeeRequiredMixin, FormView):
     form_class = AddScheduleForm
 
     def form_valid(self, form):
+        schedules = Schedule.objects.filter(user=self.request.user).filter(Q(start_time__range=[form.cleaned_data['start_time'], form.cleaned_data['end_time']]) | Q(end_time__range=[form.cleaned_data['start_time'], form.cleaned_data['end_time']]))
+        if schedules:
+            messages.error(request=self.request, message='Schedule conflict!', extra_tags='error')
+            return HttpResponseRedirect(self.get_success_url())
         Schedule.objects.create(user=self.request.user, **form.cleaned_data)
         messages.success(request=self.request, message='Schedule successfully created', extra_tags='success')
         return super().form_valid(form)
@@ -126,6 +131,10 @@ class AddScheduleManagerView(AdminRequiredMixin, FormView):
     form_class = AddAdminScheduleForm
 
     def form_valid(self, form):
+        schedules = Schedule.objects.filter(user=form.cleaned_data.get('user')).filter(Q(start_time__range=[form.cleaned_data['start_time'], form.cleaned_data['end_time']]) | Q(end_time__range=[form.cleaned_data['start_time'], form.cleaned_data['end_time']]))
+        if schedules:
+            messages.error(request=self.request, message='Employee is busy then', extra_tags='error')
+            return HttpResponseRedirect(self.get_success_url())
         Schedule.objects.create(**form.cleaned_data, approve_date=datetime.now())
         messages.success(request=self.request, message='Schedule successfully created', extra_tags='success')
         return super().form_valid(form)
