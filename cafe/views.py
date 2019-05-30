@@ -10,7 +10,7 @@ from django.views.generic import ListView, TemplateView, FormView
 
 from cafe.forms import CreateOrderForm, SupplyForm, SupplyIngredientFormSet
 from cafe.models import Shop, Cafe, Menu, Order, OrderStatus, StorageState, Supply, SuppliedIngredient
-from users.models import Salary
+from users.models import Salary, Employee
 from users.utils import EmployeeRequiredMixin, AdminRequiredMixin
 
 
@@ -174,7 +174,7 @@ class SupplyListView(AdminRequiredMixin, ListView):
 
 
 class SalaryListView(EmployeeRequiredMixin, ListView):
-    template_name = 'cafe/salaries.html'
+    template_name = 'users/salaries.html'
 
     def get_queryset(self):
-        return Salary.objects.filter(user=self.request.user)
+        return Salary.objects.all() if self.request.user.employee.job_title == Employee.ADMIN else Salary.objects.filter(user=self.request.user)

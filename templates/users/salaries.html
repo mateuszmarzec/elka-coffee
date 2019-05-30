@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap4 %}
+{% block content %}
+
+    <div class="container" style="max-width: 900px; padding-bottom: 30px">
+    <div class="container-fluid">
+        <h2 class="h1 text-center mb-3 font-weight-light">{% if not user.is_superuser %}My{% endif %} Salaries</h2>
+        <div class="col-md-12 blog-main">
+            <div class="row mb-2">
+                {% if not schedule_list %}
+                    <div class="col-md-12">
+                            <div>
+                              <p class="mb-1">
+                        <p class="text-center">Your salaries list is empty</p>
+                              </p>
+                            </div>
+                        </div>
+                {% else %}
+                    {% for salary in salary_list %}
+                        <div class="col-md-12">
+                            <div>
+                              <p class="mb-1">
+                                 Amount : {{ salary.amount }}
+                              </p>
+                                <p class="mb-1">Day of week : {{ schedule.get_week_day_display }}</p>
+                                <p class="mb-1">Shift time : {{ salary.date|date:'M d D' }}</p>
+                            </div>
+                            <hr class="mb-4">
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    </div>
+{% endblock %}
