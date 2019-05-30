@@ -21,9 +21,11 @@
                     {% for salary in salary_list %}
                         <div class="col-md-12">
                             <div>
+                                {% if user.is_superuser %}
                                 <p class="mb-1">
                                  Employee : {{ salary.user }}
                               </p>
+                                {% endif %}
                               <p class="mb-1">
                                  Amount : {{ salary.amount }} PLN
                               </p>
