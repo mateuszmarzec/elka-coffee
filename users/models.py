@@ -39,6 +39,7 @@ class Employee(models.Model):
     job_title = models.CharField(max_length=20, blank=True, choices=JOB_CHOICES)
     user = models.OneToOneField(to='User', on_delete=models.CASCADE)
     cafe = models.ForeignKey(to='cafe.Cafe', on_delete=models.SET_NULL, default=1, null=True)
+    address = models.OneToOneField(to='cafe.Address', on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         verbose_name = _('employee')

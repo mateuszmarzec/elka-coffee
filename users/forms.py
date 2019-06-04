@@ -86,8 +86,8 @@ class BookingForm(Form):
         date = self.cleaned_data.get('date')
         end_time = self.cleaned_data.get('end_time')
         shop = self.cleaned_data.get('shop')
-        if shop.start_time > end_time:
-            raise forms.ValidationError('This coffee house closes at {}'.format(end_time))
+        if shop.close_time > end_time:
+            raise forms.ValidationError('This coffee house closes at {}'.format(close_time))
         return datetime.datetime(
             year=date.year, month=date.month, day=date.day, hour=end_time.hour, minute=end_time.minute
         )
