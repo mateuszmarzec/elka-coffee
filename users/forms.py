@@ -93,7 +93,7 @@ class BookingForm(Form):
         shop = self.cleaned_data.get('shop')
         start_time = self.cleaned_data.get('start_time')
         end_time = self.cleaned_data.get('end_time')
-        if shop.start_time > start_time or shop.close_time < end_time:
+        if shop.start_time > start_time.time or shop.close_time < end_time.time:
             raise forms.ValidationError('This coffee house is open between {} and {}'.format(shop.start_time, shop.close_time))
 
         available_tables = Table.objects.filter(shop=self.cleaned_data.get('shop')).exclude(
