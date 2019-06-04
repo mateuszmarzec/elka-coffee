@@ -75,10 +75,6 @@ class BookingForm(Form):
     def clean_start_time(self):
         date = self.cleaned_data.get('date')
         start_time = self.cleaned_data.get('start_time')
-        shop = self.cleaned_data.get('shop')
-        print(shop)
-        if shop.start_time > start_time:
-            raise forms.ValidationError('This coffee house opens at {}'.format(shop.start_time))
         return datetime.datetime(
             year=date.year, month=date.month, day=date.day, hour=start_time.hour, minute=start_time.minute
         )
@@ -86,9 +82,6 @@ class BookingForm(Form):
     def clean_end_time(self):
         date = self.cleaned_data.get('date')
         end_time = self.cleaned_data.get('end_time')
-        shop = self.cleaned_data.get('shop')
-        if shop.close_time > end_time:
-            raise forms.ValidationError('This coffee house closes at {}'.format(shop.close_time))
         return datetime.datetime(
             year=date.year, month=date.month, day=date.day, hour=end_time.hour, minute=end_time.minute
         )
@@ -96,6 +89,12 @@ class BookingForm(Form):
     def clean(self):
         if self.cleaned_data.get('start_time') > self.cleaned_data.get('end_time'):
             raise forms.ValidationError('Start time can\'t be later than end time')
+
+        shop = self.cleaned_data.get('shop')
+        start_time = self.cleaned_data.get('start_time')
+        end_time = self.cleaned_data.get('end_time')
+        if shop.start_time > start_time or shop.close_time < end_time:
+            raise forms.ValidationError('This coffee house is open between {} and {}'.format(shop.start_time, shop.close_time))
 
         available_tables = Table.objects.filter(shop=self.cleaned_data.get('shop')).exclude(
             bookings__start_time__range=[self.cleaned_data.get('start_time'), self.cleaned_data.get('end_time')],
