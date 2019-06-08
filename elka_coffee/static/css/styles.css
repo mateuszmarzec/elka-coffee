@@ -4,7 +4,6 @@ a{
 }
 a:hover{
     color: #868e96;
-    text-decoration: underline!important;
 }
 
 .blog-header {
@@ -52,6 +51,10 @@ h1, h2, h3, h4, h5, h6 {
   text-align: center;
   white-space: nowrap;
   -webkit-overflow-scrolling: touch;
+}
+
+.nav a:hover {
+  text-decoration: underline;
 }
 
 .nav-scroller .nav-link {
