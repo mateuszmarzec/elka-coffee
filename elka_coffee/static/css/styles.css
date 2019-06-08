@@ -155,3 +155,11 @@ h1, h2, h3, h4, h5, h6 {
 #example_wrapper {
   width: 100%!important;
 }
+
+.dateform {
+  max-width: 200px!important;
+}
+
+#padding {
+  padding-top: 10px;
+}

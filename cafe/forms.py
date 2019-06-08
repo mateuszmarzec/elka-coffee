@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from bootstrap_datepicker_plus import DatePickerInput
 from django import forms
 from django.contrib.auth import get_user_model
 from django.forms import formset_factory, inlineformset_factory
@@ -62,4 +63,7 @@ class SupplyForm(forms.ModelForm):
 
 
 class FilterForm(forms.Form):
-    shop = forms.ModelChoiceField(queryset=Shop.objects.all(), label='Shop')
+    shop = forms.ModelChoiceField(queryset=Shop.objects.all(), label='Coffeehouse', required=False)
+    start_date = forms.DateField(widget=DatePickerInput(format='%m/%d/%Y'), label="From", required=False)
+    end_date = forms.DateField(widget=DatePickerInput(format='%m/%d/%Y'), label="To", required=False)
+

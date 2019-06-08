@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Sum, Count, Case, When, IntegerField
+from django.db.models import Sum, Count, Case, When, IntegerField, Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy, reverse
@@ -210,13 +210,18 @@ class OrderReportView(AdminRequiredMixin, ListView):
     template_name = 'cafe/order-report.html'
 
     def get_queryset(self):
+        start_date = datetime.strptime("01/01/2000" if self.request.GET.get('start_date') == '' else self.request.GET.get('start_date', "01/01/2000"), '%m/%d/%Y')
+        end_date = datetime.strptime("01/01/2100" if self.request.GET.get('end_date') == '' else self.request.GET.get('end_date', "01/01/2100"), '%m/%d/%Y')
         shop = self.request.GET.get('shop')
+
         if shop:
             return Product.objects.annotate(
-                order_count=Count(Case(When(orders__shop=shop, then=1)), output_field=IntegerField())
+                order_count=Count(
+                    'orders', filter=Q(orders__shop=shop, orders__timestamp__range=[start_date, end_date])
+                )
             )
 
-        return Product.objects.annotate(order_count=Count('orders'))
+        return Product.objects.annotate(order_count=Count('orders', filter=Q(orders__timestamp__range=[start_date, end_date])))
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(object_list=None, **kwargs)

@@ -4,7 +4,7 @@ from cafe.models import Order
 
 
 class OrdersFilter(django_filters.FilterSet):
-    date_range = django_filters.DateRangeFilter(field_name='timestamp')
+    date_range = django_filters.DateRangeFilter(field_name='Date range')
 
     class Meta:
         model = Order
