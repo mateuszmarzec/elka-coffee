@@ -59,3 +59,7 @@ class SupplyForm(forms.ModelForm):
     class Meta:
         model = Supply
         exclude = ('date', 'ingredients')
+
+
+class FilterForm(forms.Form):
+    shop = forms.ModelChoiceField(queryset=Shop.objects.all(), label='Shop')

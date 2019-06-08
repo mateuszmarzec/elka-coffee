@@ -2,14 +2,15 @@ from datetime import datetime
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Sum
+from django.db.models import Sum, Count, Case, When, IntegerField
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, TemplateView, FormView
 
-from cafe.forms import CreateOrderForm, SupplyForm, SupplyIngredientFormSet
-from cafe.models import Shop, Cafe, Menu, Order, OrderStatus, StorageState, Supply, SuppliedIngredient
+from cafe.filters import OrdersFilter
+from cafe.forms import CreateOrderForm, SupplyForm, SupplyIngredientFormSet, FilterForm
+from cafe.models import Shop, Cafe, Menu, Order, OrderStatus, StorageState, Supply, SuppliedIngredient, Product
 from users.forms import AddSalaryForm
 from users.models import Salary, Employee
 from users.utils import EmployeeRequiredMixin, AdminRequiredMixin
@@ -44,7 +45,7 @@ class OrderListView(EmployeeRequiredMixin, ListView):
     template_name = 'cafe/orders.html'
 
     def get_queryset(self):
-        return Order.objects.filter(client__isnull=True)
+        return OrdersFilter(self.request.GET, queryset=Order.objects.filter(client__isnull=True))
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(object_list=None, **kwargs)
@@ -199,3 +200,25 @@ class AddSalaryView(AdminRequiredMixin, FormView):
         for error in form.errors['__all__'].data[0].messages:
             messages.error(request=self.request, message=error, extra_tags='error')
         return HttpResponseRedirect(self.get_success_url())
+
+
+class ReportsView(AdminRequiredMixin, TemplateView):
+    template_name = 'cafe/reports.html'
+
+
+class OrderReportView(AdminRequiredMixin, ListView):
+    template_name = 'cafe/order-report.html'
+
+    def get_queryset(self):
+        shop = self.request.GET.get('shop')
+        if shop:
+            return Product.objects.annotate(
+                order_count=Count(Case(When(orders__shop=shop, then=1)), output_field=IntegerField())
+            )
+
+        return Product.objects.annotate(order_count=Count('orders'))
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(object_list=None, **kwargs)
+        context.update({'filter': FilterForm})
+        return context

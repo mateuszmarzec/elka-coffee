@@ -17,6 +17,7 @@
                         <a class="p-2 text-muted" href="{% url "users:salaries" %}">{% if not user.is_superuser %}My{% endif %} Salaries</a>
                         {% if user.employee.job_title == 'admin' %}
                             <a class="p-2 text-muted" href="{% url "users:supplies" %}">Supplies</a>
+                            <a class="p-2 text-muted" href="{% url "users:reports" %}">Reports</a>
                         {% endif %}
                     {% endif %}
                     <a class="p-2 text-muted" href="{% url "users:bookings" %}">{% if user.client %}My{% endif %} Reservations</a>
