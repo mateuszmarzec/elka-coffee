@@ -1,10 +1,11 @@
 import django_filters
 
-from cafe.models import Order
+from cafe.models import Order, Shop
 
 
 class OrdersFilter(django_filters.FilterSet):
-    date_range = django_filters.DateRangeFilter(field_name='Date range')
+    shop = django_filters.ModelChoiceFilter(queryset=Shop.objects.all(), label='Coffeehouse')
+    date_range = django_filters.DateRangeFilter(label='Date range', field_name='timestamp')
 
     class Meta:
         model = Order
