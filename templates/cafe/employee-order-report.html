@@ -5,10 +5,10 @@
 
     <div class="container" style="max-width: 900px; padding-bottom: 30px">
     <div class="container-fluid">
-        <h2 class="h1 text-center mb-3 font-weight-light">Product orders report</h2>
+        <h2 class="h1 text-center mb-3 font-weight-light">Employee orders report</h2>
         <div class="col-md-12 blog-main">
             <div class="row mb-2">
-                {% if not product_list %}
+                {% if not user_list %}
                     <div class="col-md-12">
                             <div>
                               <p class="mb-1">
@@ -20,15 +20,17 @@
                     <table id="example" class="table table-striped table-bordered text-center" cellspacing="0" width="100%">
                       <thead>
                         <tr>
-                          <th scope="col">Product</th>
+                          <th scope="col">Employee full name</th>
+                          <th scope="col">Employee type</th>
                           <th scope="col">Order count</th>
                         </tr>
                       </thead>
                       <tbody>
-                            {% for product in product_list %}
+                            {% for user in user_list %}
                                 <tr>
-                                  <td>{{ product.name }}</td>
-                                  <td>{{ product.order_count }}</td>
+                                  <td>{{ user }}</td>
+                                  <td>{{ user.employee.job_title }}</td>
+                                  <td>{{ user.order_count }}</td>
                                 </tr>
                         {% endfor %}
                         </tbody>

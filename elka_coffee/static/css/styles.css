@@ -147,7 +147,7 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 0.9rem;
 }
 
-.mybutton{
+.btn.mybutton{
   background-color: #343a40!important;
   border-color: #343a40!important;
 }
@@ -157,7 +157,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .dateform {
-  max-width: 200px!important;
+  max-width: 230px!important;
 }
 
 #padding {

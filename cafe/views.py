@@ -10,9 +10,10 @@ from django.views.generic import ListView, TemplateView, FormView
 
 from cafe.filters import OrdersFilter
 from cafe.forms import CreateOrderForm, SupplyForm, SupplyIngredientFormSet, FilterForm
-from cafe.models import Shop, Cafe, Menu, Order, OrderStatus, StorageState, Supply, SuppliedIngredient, Product
+from cafe.models import Shop, Cafe, Menu, Order, OrderStatus, StorageState, Supply, SuppliedIngredient, Product, \
+    Ingredient
 from users.forms import AddSalaryForm
-from users.models import Salary, Employee
+from users.models import Salary, Employee, User
 from users.utils import EmployeeRequiredMixin, AdminRequiredMixin
 
 
@@ -206,7 +207,7 @@ class ReportsView(AdminRequiredMixin, TemplateView):
     template_name = 'cafe/reports.html'
 
 
-class OrderReportView(AdminRequiredMixin, ListView):
+class ProductOrderReportView(AdminRequiredMixin, ListView):
     template_name = 'cafe/order-report.html'
 
     def get_queryset(self):
@@ -222,6 +223,67 @@ class OrderReportView(AdminRequiredMixin, ListView):
             )
 
         return Product.objects.annotate(order_count=Count('orders', filter=Q(orders__timestamp__range=[start_date, end_date])))
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(object_list=None, **kwargs)
+        context.update({'filter': FilterForm})
+        return context
+
+
+class EmployeeOrderReportView(AdminRequiredMixin, ListView):
+    template_name = 'cafe/employee-order-report.html'
+
+    def get_queryset(self):
+        start_date = datetime.strptime("01/01/2000" if self.request.GET.get('start_date') == '' else self.request.GET.get('start_date', "01/01/2000"), '%m/%d/%Y')
+        end_date = datetime.strptime("01/01/2100" if self.request.GET.get('end_date') == '' else self.request.GET.get('end_date', "01/01/2100"), '%m/%d/%Y')
+        shop = self.request.GET.get('shop')
+
+        if shop:
+            return User.objects.filter(employee__isnull=False).annotate(
+                order_count=Count(
+                    'accepted_by', filter=Q(accepted_by__shop=shop, accepted_by__timestamp__range=[start_date, end_date])
+                )
+            )
+
+        return User.objects.filter(employee__isnull=False).annotate(order_count=Count('accepted_by', filter=Q(accepted_by__timestamp__range=[start_date, end_date])))
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(object_list=None, **kwargs)
+        context.update({'filter': FilterForm})
+        return context
+
+
+class IngredientUsageReportView(AdminRequiredMixin, ListView):
+    template_name = 'cafe/ingredient-report.html'
+
+    def get_queryset(self):
+        start_date = datetime.strptime("01/01/2000" if self.request.GET.get('start_date') == '' else self.request.GET.get('start_date', "01/01/2000"), '%m/%d/%Y')
+        end_date = datetime.strptime("01/01/2100" if self.request.GET.get('end_date') == '' else self.request.GET.get('end_date', "01/01/2100"), '%m/%d/%Y')
+        shop = self.request.GET.get('shop')
+
+        ingredients = Ingredient.objects.all()
+
+        if shop:
+            for ingredient in ingredients:
+                amount = 0
+                for product in ingredient.products.all():
+                    for order in product.orders.filter(timestamp__range=[start_date, end_date], shop=shop):
+                        ingredient_in_product = order.products.annotate(
+                            ingredient_sum=Sum('productingredient__amount', filter=Q(
+                                productingredient__ingredient=ingredient))
+                        )
+                        amount += sum([x.ingredient_sum or 0 for x in ingredient_in_product])
+                ingredient.ingredient_sum = amount
+        else:
+            for ingredient in ingredients:
+                amount = 0
+                for product in ingredient.products.all():
+                    for order in product.orders.filter(timestamp__range=[start_date, end_date]):
+                        ingredient_in_product = order.products.annotate(ingredient_sum=Sum('productingredient__amount', filter=Q(productingredient__ingredient=ingredient)))
+                        amount += sum([x.ingredient_sum or 0 for x in ingredient_in_product])
+                ingredient.ingredient_sum = amount
+
+        return ingredients
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(object_list=None, **kwargs)

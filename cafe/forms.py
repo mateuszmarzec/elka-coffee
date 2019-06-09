@@ -66,4 +66,3 @@ class FilterForm(forms.Form):
     shop = forms.ModelChoiceField(queryset=Shop.objects.all(), label='Coffeehouse', required=False)
     start_date = forms.DateField(widget=DatePickerInput(format='%m/%d/%Y'), label="From", required=False)
     end_date = forms.DateField(widget=DatePickerInput(format='%m/%d/%Y'), label="To", required=False)
-
