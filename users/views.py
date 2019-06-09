@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import FormView, TemplateView, ListView
 
+from cafe.filters import ScheduleFilter
 from cafe.models import Table
 from users.forms import RegisterForm, BookingForm, AddScheduleForm, AddAdminScheduleForm
 from users.models import Client, Booking, Schedule, Employee
@@ -79,9 +80,10 @@ class ScheduleListView(EmployeeRequiredMixin, ListView):
     template_name = 'users/schedules.html'
 
     def get_queryset(self):
-        return Schedule.objects.filter(
-            user=self.request.user, approve_date__isnull=False
-        ) if self.request.user.employee.job_title != Employee.ADMIN else Schedule.objects.all()
+        return ScheduleFilter(self.request.GET, queryset=Schedule.objects.filter(
+            user=self.request.user, approve_date__isnull=False))\
+            if self.request.user.employee.job_title != Employee.ADMIN else ScheduleFilter(
+            self.request.GET, queryset=Schedule.objects.all())
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(object_list=None, **kwargs)
