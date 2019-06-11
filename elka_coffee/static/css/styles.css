@@ -163,3 +163,7 @@ h1, h2, h3, h4, h5, h6 {
 #padding {
   padding-top: 10px;
 }
+
+.blog-post {
+  width: 100%;
+}
