@@ -31,12 +31,12 @@
                                 <p class="mb-1">Shift time : {{ schedule.start_time|time:'H:i' }} - {{ schedule.end_time|time:'H:i' }}</p>
                                 <span class="mb-1">Status : {% if schedule.approve_date %} ACCEPTED {% else %} PENDING {% endif %}
                                 {% if user.is_superuser %}
-                                    <form method="post" action="{% url "users:update-schedules" schedule.pk %}" style="display: inherit; margin-block-end: 0em;">
+                                    <form method="post" action="{% url "users:update-schedules" schedule.pk %}" style="display: inherit; margin-block-end: 0em; position: absolute;right: 10px;">
                                         {% csrf_token %}
                                         <input name="change" class="btn btn-sm btn-danger btn-primary" type="submit" value="Cancel" style="float: right;">
                                     </form>
                                     {% if not schedule.approve_date %}
-                                <form method="post" action="{% url "users:update-schedules" schedule.pk %}" style="display: inherit; margin-block-end: 0em;">
+                                <form method="post" action="{% url "users:update-schedules" schedule.pk %}" style="display: inherit; margin-block-end: 0em; position: absolute;right: 110px;">
                                     {% csrf_token %}
                                     <input name="change" class="btn btn-sm mybutton btn-primary" type="submit" value="Accept" style="float: right; margin-right: 5px">
                                 </form>
